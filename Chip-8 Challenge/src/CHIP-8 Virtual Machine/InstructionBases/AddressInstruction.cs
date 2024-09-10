@@ -6,7 +6,7 @@ public class AddressInstruction : Instruction
 
     public override string Disassemble(VM vm)
     {
-        return $"{Mnemonic.PadRight(5)} {Address.ToHexString()}";
+        return $"{Mnemonic.PadRight(5)} 0x{Address.ToHexString()}";
     }
 
     public AddressInstruction(Tribble address)

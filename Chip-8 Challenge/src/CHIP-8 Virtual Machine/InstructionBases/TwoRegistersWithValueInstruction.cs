@@ -8,7 +8,7 @@ public class TwoRegistersWithValueInstruction : Instruction
 
     public override string Disassemble(VM vm)
     {
-        return $"{Mnemonic.PadRight(5)} V{X}[{vm.V[X].ToString("X2")}],V{Y}[{vm.V[Y].ToString("X2")}],{Value.ToHexString()}";
+        return $"{Mnemonic.PadRight(5)} V{X}{ValueOfRegister(vm, X)},V{Y}{ValueOfRegister(vm, Y)},0x{Value.ToHexString()}";
     }
 
     public TwoRegistersWithValueInstruction(Register X, Register Y, Nibble value)

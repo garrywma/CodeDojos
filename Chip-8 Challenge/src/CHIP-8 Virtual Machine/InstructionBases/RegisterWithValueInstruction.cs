@@ -7,7 +7,7 @@ public class RegisterWithValueInstruction : Instruction
 
     public override string Disassemble(VM vm)
     {
-        return $"{Mnemonic.PadRight(5)} V{X}[{vm.V[X].ToString("X2")}],{Value.ToString("X2")}";
+        return $"{Mnemonic.PadRight(5)} V{X}{ValueOfRegister(vm, X)},0x{Value.ToString("X2")}";
     }
 
     public RegisterWithValueInstruction(Register X, byte value)

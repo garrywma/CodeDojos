@@ -1,10 +1,12 @@
 ﻿using CHIP_8_Virtual_Machine;
+using CHIP_8_Virtual_Machine.Instructions;
 
 namespace CHIP_8_Console
 {
     public class Program
     {
         private static VM _vm;
+        private static bool _foundSUB;
         static void Main(string[] args)
         {
             Console.WriteLine("Will load PONG and run. Press CTRL+C at any time to quit.");
@@ -12,27 +14,30 @@ namespace CHIP_8_Console
             ((IDebugVM)_vm).ReplaceTimers(new DebugTimer(_vm), new DebugTimer(_vm));
             _vm.Load("pong.rom");
             _vm.OnAfterExecution += OnAfterExecution;
-            _vm.Run(ClockMode.Threaded);
+            _vm.Run(ClockMode.Threaded, 0);
             while (true) ;
         }
 
         private static void OnAfterExecution(object sender, ExecutionResult e)
         {
+            if (e.Instruction is SUB) _foundSUB = true;
+
             ((IDebugVM)_vm).Pause();
 
             Console.WriteLine($"PC:{e.PC.ToString("X3")}\t{GetOpcodeAndMnemonic()}\tI:{e.I.ToHexString()}\tF:{e.F.ToString("X2")}");
-            while (true)
+            while (_foundSUB)
             {
                 if (Console.KeyAvailable)
                 {
                     char c = Console.ReadKey(true).KeyChar;
                     if (c == '\r')
                     {
-                        ((IDebugVM)_vm).Resume(); 
                         break;
                     }
                 }
             }
+
+            ((IDebugVM)_vm).Resume();
 
             string GetOpcodeAndMnemonic()
             {

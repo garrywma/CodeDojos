@@ -1,8 +1,8 @@
 ﻿using Timer = System.Timers.Timer;
 
 namespace CHIP_8_Virtual_Machine
-{
-    public class HardwareTimer : ITimer
+{ 
+    public class DelayTimer : ITimer
     {
         private const int STANDARD_INTERVAL = 17;
         private const int FAST_INTERVAL = 16;
@@ -58,7 +58,7 @@ namespace CHIP_8_Virtual_Machine
             // do something on each tick of the timer (do we need this?)
         }
 
-        public HardwareTimer()
+        public DelayTimer()
         {
             _windowsTimer = new Timer(STANDARD_INTERVAL);
             _windowsTimer.Elapsed += WindowsTimerElapsed;

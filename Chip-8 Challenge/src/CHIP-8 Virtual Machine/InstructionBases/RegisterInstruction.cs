@@ -6,7 +6,7 @@ public class RegisterInstruction : Instruction
 
     public override string Disassemble(VM vm)
     {
-        return $"{Mnemonic.PadRight(5)} V{X}[{vm.V[X].ToString("X2")}]";
+        return $"{Mnemonic.PadRight(5)} V{X}{ValueOfRegister(vm, X)}";
     }
 
     public RegisterInstruction(Register X, byte discriminator)

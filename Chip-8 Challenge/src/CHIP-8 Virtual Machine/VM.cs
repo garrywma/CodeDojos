@@ -21,6 +21,7 @@ namespace CHIP_8_Virtual_Machine
         private Clock _clock;
         private Keypad _keypad;
         private Display _display;
+        private Sound _sound;
         private SystemFont _systemFont;
         private ITimer _delayTimer;
         private ITimer _soundTimer;
@@ -28,8 +29,8 @@ namespace CHIP_8_Virtual_Machine
         public RAM RAM => _ram;
         public Keypad Keypad => _keypad;
         public Display Display => _display;
+        public Sound Sound => _sound;
         public ITimer DelayTimer => _delayTimer;
-        public ITimer SoundTimer => _soundTimer;
         public SystemFont SystemFont => _systemFont;
 
         public VRegisters V => _vregisters;
@@ -47,8 +48,8 @@ namespace CHIP_8_Virtual_Machine
             _stack = new Stack<Tribble>();
             _keypad = new Keypad(keypadMap);
             _display = new Display(this);
-            _delayTimer = new HardwareTimer();
-            _soundTimer = new HardwareTimer();
+            _delayTimer = new DelayTimer();
+            _sound = new Sound();
 
             // load system font into memory
             _systemFont = new SystemFont();
@@ -100,9 +101,9 @@ namespace CHIP_8_Virtual_Machine
             }
         }
 
-        internal void SetFlag(bool value)
+        internal void SetFlag(bool flagState)
         {
-            V[0xF] = (byte)(value ? 1 : 0);
+            V[0xF] = (byte)(flagState ? 1 : 0);
         }
 
         internal void PushStack(Tribble value)
@@ -120,13 +121,16 @@ namespace CHIP_8_Virtual_Machine
             ushort opcode = _ram.GetWord(PC);
             Instruction instruction = InstructionDecoder.DecodeInstruction(opcode);
             ushort pc = PC;
-            PC += (PC + 2 < 0xFFF) ? 2 : 0;
+            PC += 2;
 
             instruction.Execute(this);
-            ExecutionResult result = new ExecutionResult(instruction, opcode, pc, I, F, V, _stack, _keypad.State);
-            OnAfterExecution?.Invoke(this, result);
+            if (OnAfterExecution is not null)
+            {
+                ExecutionResult result = new ExecutionResult(instruction, opcode, pc, I, F, V, _stack, _keypad.State);
+                OnAfterExecution.Invoke(this, result);
+            }
 
-            if (PC == 0xFFF)
+            if (PC >= 0xFFF)
             {
                 Console.WriteLine("End of memory reached");
                 _clock.Stop();
@@ -134,9 +138,9 @@ namespace CHIP_8_Virtual_Machine
             }
         }
 
-        public void Run(ClockMode clockMode)
+        public void Run(ClockMode clockMode, int cycleLengthInMilliseconds)
         {
-            _clock = new Clock(clockMode, InstructionCycle);
+            _clock = new Clock(clockMode, InstructionCycle, cycleLengthInMilliseconds);
             _clock.Start();
         }
 

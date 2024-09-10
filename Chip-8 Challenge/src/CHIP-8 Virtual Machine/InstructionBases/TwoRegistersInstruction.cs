@@ -7,7 +7,7 @@ public class TwoRegistersInstruction : Instruction
 
     public override string Disassemble(VM vm)
     {
-        return $"{Mnemonic.PadRight(5)} V{X}[{vm.V[X].ToString("X2")}],V{Y}[{vm.V[Y].ToString("X2")}]";
+        return $"{Mnemonic.PadRight(5)} V{X}{ValueOfRegister(vm, X)},V{Y}{ValueOfRegister(vm, Y)}";
     }
 
     public TwoRegistersInstruction(Register X, Register Y, Nibble discriminator)

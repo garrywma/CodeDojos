@@ -5,9 +5,11 @@ public class ADDR : TwoRegistersInstruction
 {
     public override void Execute(VM vm)
     {
-        byte previousValue = vm.V[X];
+        int x = vm.V[X];
+        int y = vm.V[Y];
+        vm.SetFlag(x + y > 0xFF);
+
         vm.V[X] += vm.V[Y];
-        vm.SetFlag(previousValue > vm.V[X]);
     }
 
     public ADDR(Register X, Register Y)

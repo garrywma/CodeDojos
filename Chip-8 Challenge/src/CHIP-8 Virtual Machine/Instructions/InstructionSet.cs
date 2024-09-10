@@ -13,15 +13,15 @@ public static class InstructionSet
 
     static InstructionSet()
     {
-        _instructions.Add("CLR", (arguments) => new CLR(arguments));
-        _instructions.Add("RTS", (arguments) => new RTS(arguments));
+        _instructions.Add("CLR", (arguments) => new CLS(arguments));
+        _instructions.Add("RTS", (arguments) => new RET(arguments));
         _instructions.Add("SYS", (arguments) => new SYS(arguments));
-        _instructions.Add("JUMP", (arguments) => new JUMP(arguments));
+        _instructions.Add("JUMP", (arguments) => new JP(arguments));
         _instructions.Add("CALL", (arguments) => new CALL(arguments));
         _instructions.Add("SKE", (arguments) => new SKE(arguments.HighNibble, arguments.LowByte));
         _instructions.Add("SKNE", (arguments) => new SKNE(arguments.HighNibble, arguments.LowByte));
         _instructions.Add("SKRE", (arguments) => new SKRE(arguments.HighNibble, arguments.MiddleNibble));
-        _instructions.Add("LOAD", (arguments) => new LOAD(arguments.HighNibble, arguments.LowByte));
+        _instructions.Add("LOAD", (arguments) => new LD(arguments.HighNibble, arguments.LowByte));
         _instructions.Add("ADD", (arguments) => new ADD(arguments.HighNibble, arguments.LowByte));
         _instructions.Add("MOVE", (arguments) => new MOVE(arguments.HighNibble, arguments.MiddleNibble));
         _instructions.Add("OR", (arguments) => new OR(arguments.HighNibble, arguments.MiddleNibble));

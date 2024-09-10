@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using CHIP_8_Virtual_Machine;
 using System;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Chip8.UI.Wpf
 {
@@ -20,75 +21,57 @@ namespace Chip8.UI.Wpf
     {
         private bool _isClosing = false;
         private VM _vm;
+        private string _imagePath;
 
         public MainWindow()
         {
-            _vm = new VM(new WindowsKeypadMap());
-
             KeyDown += MainWindow_KeyDown;
             KeyUp += MainWindow_KeyUp;
 
             OpenFileDialog dialog = new OpenFileDialog();
             if (dialog.ShowDialog() == true)
             {
-                string imagePath = dialog.FileName;
-                _vm.Load(imagePath);
-                _vm.Display.OnDisplayUpdated += UpdateDisplay;
-                _vm.Run(ClockMode.Threaded);
+                _imagePath = dialog.FileName;
             }
             else
             {
                 this.Close();
             }
+
+            SetupVM();
+        }
+
+
+        private void SetupVM()
+        {
+            _vm = new VM(new WindowsKeypadMap());
+            _vm.Load(_imagePath);
+            _vm.Display.OnDisplayUpdated += (sender, pixels) => UpdateDisplay(pixels);
+            _vm.Run(ClockMode.Threaded, 2);
+
+            // play a beep to initialise Console.Beep properly
+            _vm.Sound.Beep(500);
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)
         {
             _vm.Keypad.KeyUp(e.Key.ToString());
-            Keymap.Text = "Keymap: " + _vm.Keypad.ToString();
         }
 
         private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             _vm.Keypad.KeyDown(e.Key.ToString());
-            Keymap.Text = "Keymap: " + _vm.Keypad.ToString();
         }
 
-        private void UpdateDisplay(object sender, bool[,] pixels)
+        private void UpdateDisplay(bool[,] pixels)
         {
-            Task.Run(() =>
+            int magnification = 20;
+            byte[] pixelBytes = pixels.ToRGBA(magnification, out var dimensions);
+
+            Dispatcher.InvokeAsync(() =>
             {
-                if (!_isClosing)
-                {
-                    Dispatcher.InvokeAsync(() =>
-                    {
-
-                        int magnification = 20;
-                        int xExtent = pixels.GetLength(0) * magnification;
-                        int yExtent = pixels.GetLength(1) * magnification;
-
-                        byte[] pixelBytes = new byte[xExtent * yExtent * 4];
-                        int pixelIndex = 0;
-
-                        // x left to right, add 4 bytes per pixel (RGBA), then next line
-                        for (int y = 0; y < yExtent; y++)
-                        {
-                            for (int x = 0; x < xExtent; x++)
-                            {
-                                byte pixel = (byte)(pixels[x / magnification, y / magnification] ? 255 : 0);
-                                pixelBytes[pixelIndex++] = pixel; // Red
-                                pixelBytes[pixelIndex++] = pixel; // Green
-                                pixelBytes[pixelIndex++] = pixel; // Blue
-                                pixelBytes[pixelIndex++] = 255;   // Alpha (always 0xFF)
-                            }
-                        }
-
-                        var bitmap = BitmapFactory.New(xExtent, yExtent).FromByteArray(pixelBytes);
-
-                        Screen.Stretch = Stretch.None;
-                        Screen.Source = bitmap;
-                    });
-                }
+                var bitmap = BitmapFactory.New(dimensions.Width, dimensions.Height).FromByteArray(pixelBytes);
+                Screen.Source = bitmap;
             });
         }
         
