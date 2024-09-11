@@ -2,11 +2,10 @@
 {
     public static class PixelExtensions
     {
-        public static byte[] ToRGBA(this bool[,] pixels, int magnification, out (int Width, int Height) dimensions)
+        public static byte[] ToRGBA(this bool[,] pixels, int magnification)
         {
             int width = pixels.GetLength(0) * magnification;
             int height = pixels.GetLength(1) * magnification;
-            dimensions = (width, height);
 
             byte[] pixelBytes = new byte[width * height * 4];
             int pixelIndex = 0;

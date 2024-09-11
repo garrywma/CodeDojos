@@ -46,7 +46,7 @@ namespace Chip8.UI.Wpf
         {
             _vm = new VM(new WindowsKeypadMap());
             _vm.Load(_imagePath);
-            _vm.Display.OnDisplayUpdated += (sender, pixels) => UpdateDisplay(pixels);
+            _vm.Display.OnDisplayUpdated += (sender, info) => UpdateDisplay(info);
             _vm.Run(ClockMode.Threaded, 2);
 
             // play a beep to initialise Console.Beep properly
@@ -63,14 +63,14 @@ namespace Chip8.UI.Wpf
             _vm.Keypad.KeyDown(e.Key.ToString());
         }
 
-        private void UpdateDisplay(bool[,] pixels)
+        private void UpdateDisplay(DisplayUpdateInfo info)
         {
             int magnification = 20;
-            byte[] pixelBytes = pixels.ToRGBA(magnification, out var dimensions);
+            byte[] pixelBytes = info.Pixels.ToRGBA(magnification);
 
             Dispatcher.InvokeAsync(() =>
             {
-                var bitmap = BitmapFactory.New(dimensions.Width, dimensions.Height).FromByteArray(pixelBytes);
+                var bitmap = BitmapFactory.New(info.Width, info.Height).FromByteArray(pixelBytes);
                 Screen.Source = bitmap;
             });
         }

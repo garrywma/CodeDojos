@@ -1,6 +1,6 @@
-﻿namespace CHIP_8_Virtual_Machine;
+﻿using System.Runtime.InteropServices;
 
-public record SpriteInfo(int X, int Y, bool[,] Pixels);
+namespace CHIP_8_Virtual_Machine;
 
 public class Display
 {
@@ -10,7 +10,9 @@ public class Display
     private VM _vm;
     private bool[,] _pixels;
 
-    public event EventHandler<bool[,]> OnDisplayUpdated;
+    private Timer _refreshTimer;
+
+    public event EventHandler<DisplayUpdateInfo> OnDisplayUpdated;
     public event EventHandler<SpriteInfo> OnSpriteDisplayed;
     public event EventHandler OnDisplayCleared;
 
@@ -18,15 +20,21 @@ public class Display
 
     public Display(VM vm)
     {
-        _pixels = new bool[64, 32];
+        InitialiseDisplay();
         _vm = vm;
     }
 
     public void Clear()
     {
-        _pixels = new bool[64, 32];
+        InitialiseDisplay();
+
         OnDisplayCleared?.Invoke(this, EventArgs.Empty);
-        OnDisplayUpdated?.Invoke(this, _pixels);
+        OnDisplayUpdated?.Invoke(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
+    }
+
+    private void InitialiseDisplay()
+    {
+        _pixels = new bool[DISPLAY_WIDTH, DISPLAY_HEIGHT];
     }
 
     public bool DisplayChar(int x, int y, char c)
@@ -60,7 +68,7 @@ public class Display
                         pixelErased = true;
                     }
 
-                    _pixels[localX, localY] = currentPixelState ^ newPixelState;
+                    _pixels[localX, localY] = (currentPixelState ^ newPixelState);
                     spritePixels[(7 - j), i] = _pixels[localX, localY];
                 }
             }
@@ -71,7 +79,7 @@ public class Display
         }
 
         OnSpriteDisplayed?.Invoke(this, new SpriteInfo(x, y, spritePixels));
-        OnDisplayUpdated?.Invoke(this, _pixels);
+        OnDisplayUpdated?.Invoke(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
 
         return pixelErased;
     }

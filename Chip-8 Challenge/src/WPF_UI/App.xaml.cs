@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Zem80.ZXSpectrumApp
+namespace Chip8.UI.Wpf
 {
     /// <summary>
     /// Interaction logic for App.xaml
