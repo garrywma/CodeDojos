@@ -24,7 +24,6 @@ namespace CHIP_8_Virtual_Machine
         private Sound _sound;
         private SystemFont _systemFont;
         private ITimer _delayTimer;
-        private ITimer _soundTimer;
 
         public RAM RAM => _ram;
         public Keypad Keypad => _keypad;
@@ -56,10 +55,9 @@ namespace CHIP_8_Virtual_Machine
             _systemFont.InstallTo(_ram);
         }
 
-        void IDebugVM.ReplaceTimers(ITimer delayTimer, ITimer soundTimer)
+        void IDebugVM.ReplaceTimer(ITimer delayTimer)
         {
             _delayTimer = delayTimer;
-            _soundTimer = soundTimer;
         }
 
         void IDebugVM.Pause()

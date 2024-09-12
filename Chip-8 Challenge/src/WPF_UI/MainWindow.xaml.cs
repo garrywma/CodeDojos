@@ -28,20 +28,27 @@ namespace Chip8.UI.Wpf
         {
             KeyDown += MainWindow_KeyDown;
             KeyUp += MainWindow_KeyUp;
-
-            OpenFileDialog dialog = new OpenFileDialog();
-            if (dialog.ShowDialog() == true)
-            {
-                _imagePath = dialog.FileName;
-            }
-            else
-            {
-                this.Close();
-            }
-
-            SetupVM();
         }
 
+        protected override void OnContentRendered(EventArgs e)
+        {
+            base.OnContentRendered(e);
+
+            if (_vm is null)
+            {
+                OpenFileDialog dialog = new OpenFileDialog();
+                if (dialog.ShowDialog() == true)
+                {
+                    _imagePath = dialog.FileName;
+                }
+                else
+                {
+                    this.Close();
+                }
+
+                SetupVM();
+            }
+        }
 
         private void SetupVM()
         {
@@ -49,9 +56,6 @@ namespace Chip8.UI.Wpf
             _vm.Load(_imagePath);
             _vm.Display.OnDisplayUpdated += (sender, info) => UpdateDisplay(info);
             _vm.Run(ClockMode.Threaded, 2);
-
-            // play a beep to initialise Console.Beep properly
-            _vm.Sound.Beep(500);
         }
 
         private void MainWindow_KeyUp(object sender, KeyEventArgs e)

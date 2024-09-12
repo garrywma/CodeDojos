@@ -4,6 +4,6 @@
     {
         void Pause();
         void Resume();
-        void ReplaceTimers(ITimer delayTimer, ITimer soundTimer);
+        void ReplaceTimer(ITimer delayTimer);
     }
 }

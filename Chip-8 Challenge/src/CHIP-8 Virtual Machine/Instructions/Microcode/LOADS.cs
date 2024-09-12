@@ -6,7 +6,7 @@ public class LOADS : RegisterInstruction
 {
     public override void Execute(VM vm)
     {
-        vm.Sound.Beep(vm.V[X]);
+        vm.Sound.Beep((1000 / 60) * vm.V[X]);
     }
 
     public LOADS(Register X)
