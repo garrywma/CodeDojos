@@ -11,7 +11,6 @@ public class Display
 
     private VM _vm;
     private bool[,] _pixels;
-    private bool[,] _lastPixels;
     private bool _doubleBuffering;
 
     private Timer _refreshTimer;
@@ -65,6 +64,7 @@ public class Display
                     int localX = (x + (7 - j));
                     int localY = (y + i);
 
+                    // TODO: if the sprite is drawn *entirely* off screen, it should wrap around to the other side
                     if (localX >= DISPLAY_WIDTH || localY >= DISPLAY_HEIGHT) continue;
 
                     bool currentPixelState = _pixels[localX, localY];
@@ -87,7 +87,6 @@ public class Display
 
         OnSpriteDisplayed?.Invoke(this, new SpriteInfo(x, y, spritePixels));
         OnDisplayUpdated?.Invoke(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
-        Array.Copy(_pixels, _lastPixels, _pixels.Length);
 
         return pixelErased;
     }
