@@ -11,7 +11,7 @@ namespace CHIP_8_Console
         {
             Console.WriteLine("Will load PONG and run. Press CTRL+C at any time to quit.");
             _vm = new VM(new WindowsKeypadMap());
-            ((IDebugVM)_vm).ReplaceTimers(new DebugTimer(_vm), new DebugTimer(_vm));
+            ((IDebugVM)_vm).ReplaceTimer(new DebugTimer(_vm));
             _vm.Load("pong.rom");
             _vm.OnAfterExecution += OnAfterExecution;
             _vm.Run(ClockMode.Threaded, 0);

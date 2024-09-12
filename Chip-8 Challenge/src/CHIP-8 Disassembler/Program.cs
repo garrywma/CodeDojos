@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            string path = "c:\\temp\\pong.rom"; // args[0];
+            string path = args[0];
             if (File.Exists(path))
             {
                 byte[] program = File.ReadAllBytes(path);

@@ -34,11 +34,12 @@ namespace CHIP_8_Virtual_Machine
 
         public VRegisters V => _vregisters;
 
-        public Tribble PC { get; set; }
-        public Tribble I { get; set; }
-        public byte F { get { return V[0xF]; } }
+        public Tribble PC { get; set; } // Program Counter
+        public Tribble I { get; set; } // Index Register
+        public byte F { get { return V[0xF]; } } // Flag Register
 
         public event EventHandler<ExecutionResult> OnAfterExecution;
+        public event EventHandler OnEndOfMemoryReached;
 
         public VM(IKeypadMap keypadMap = null)
         {
@@ -77,26 +78,17 @@ namespace CHIP_8_Virtual_Machine
                 throw new ArgumentOutOfRangeException("ROM is too large to fit in RAM");
             }
 
+            PC = 0x200;
             for (ushort i = 0; i < bytes.Length; i++)
             {
-                PC = 0x200;
                 _ram[i + PC] = bytes[i];
             }
         }
 
         public void Load(string path)
         {
-            byte[] rom = System.IO.File.ReadAllBytes(path);
-            if (rom.Length > RAM.RAM_SIZE)
-            {
-                throw new ArgumentOutOfRangeException("ROM is too large to fit in RAM");
-            }
-
-            for (ushort i = 0; i < rom.Length; i++)
-            {
-                PC = 0x200;
-                _ram[i + PC] = rom[i];
-            }
+            byte[] rom = File.ReadAllBytes(path);
+            Load(rom);
         }
 
         internal void SetFlag(bool flagState)
@@ -132,14 +124,14 @@ namespace CHIP_8_Virtual_Machine
 
                 if (PC >= 0xFFF)
                 {
-                    Console.WriteLine("End of memory reached");
-                    _clock.Stop();
+                    Stop();
+                    OnEndOfMemoryReached?.Invoke(this, EventArgs.Empty);
                     return;
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw ex; // re-throw is deliberate here
             }
         }
 

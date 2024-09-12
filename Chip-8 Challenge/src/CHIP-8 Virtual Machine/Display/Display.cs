@@ -40,7 +40,6 @@ public class Display
     private void InitialiseDisplay()
     {
         _pixels = new bool[DISPLAY_WIDTH, DISPLAY_HEIGHT];
-        _lastPixels = new bool[DISPLAY_WIDTH, DISPLAY_HEIGHT];
     }
 
     public bool DisplayChar(int x, int y, char c)
