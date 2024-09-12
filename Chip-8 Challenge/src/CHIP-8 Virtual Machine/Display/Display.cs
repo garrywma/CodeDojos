@@ -86,7 +86,7 @@ public class Display
         }
 
         OnSpriteDisplayed?.Invoke(this, new SpriteInfo(x, y, spritePixels));
-        OnDisplayUpdated(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
+        OnDisplayUpdated?.Invoke(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
         Array.Copy(_pixels, _lastPixels, _pixels.Length);
 
         return pixelErased;
