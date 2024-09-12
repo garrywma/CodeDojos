@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.ComponentModel;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace CHIP_8_Virtual_Machine;
 
@@ -9,6 +11,8 @@ public class Display
 
     private VM _vm;
     private bool[,] _pixels;
+    private bool[,] _lastPixels;
+    private bool _doubleBuffering;
 
     private Timer _refreshTimer;
 
@@ -18,10 +22,12 @@ public class Display
 
     public bool[,] Pixels => _pixels;
 
-    public Display(VM vm)
+    public Display(VM vm, bool doubleBuffering = false)
     {
+        _doubleBuffering = doubleBuffering;
         InitialiseDisplay();
         _vm = vm;
+
     }
 
     public void Clear()
@@ -35,6 +41,7 @@ public class Display
     private void InitialiseDisplay()
     {
         _pixels = new bool[DISPLAY_WIDTH, DISPLAY_HEIGHT];
+        _lastPixels = new bool[DISPLAY_WIDTH, DISPLAY_HEIGHT];
     }
 
     public bool DisplayChar(int x, int y, char c)
@@ -79,7 +86,8 @@ public class Display
         }
 
         OnSpriteDisplayed?.Invoke(this, new SpriteInfo(x, y, spritePixels));
-        OnDisplayUpdated?.Invoke(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
+        OnDisplayUpdated(this, new DisplayUpdateInfo(_pixels, DISPLAY_WIDTH, DISPLAY_HEIGHT));
+        Array.Copy(_pixels, _lastPixels, _pixels.Length);
 
         return pixelErased;
     }

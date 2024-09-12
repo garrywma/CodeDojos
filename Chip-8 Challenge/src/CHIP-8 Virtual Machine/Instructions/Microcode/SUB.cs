@@ -5,7 +5,7 @@ public class SUB : TwoRegistersInstruction
 {
     public override void Execute(VM vm)
     {
-        vm.SetFlag(vm.V[X] >= vm.V[Y]);
+        vm.SetFlag(vm.V[X] > vm.V[Y]);
         vm.V[X] -= vm.V[Y];
     }
 

@@ -11,6 +11,7 @@ using CHIP_8_Virtual_Machine;
 using System;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using System.Windows.Media.Media3D;
 
 namespace Chip8.UI.Wpf
 {
@@ -65,13 +66,34 @@ namespace Chip8.UI.Wpf
 
         private void UpdateDisplay(DisplayUpdateInfo info)
         {
-            int magnification = 20;
-            byte[] pixelBytes = info.Pixels.ToRGBA(magnification);
-
-            Dispatcher.InvokeAsync(() =>
+            Task.Run(() =>
             {
-                var bitmap = BitmapFactory.New(info.Width, info.Height).FromByteArray(pixelBytes);
-                Screen.Source = bitmap;
+                int magnification = 20;
+                int width = info.Width * magnification;
+                int height = info.Height * magnification;
+
+                byte[] pixelBytes = new byte[width * height * 4];
+                int pixelIndex = 0;
+
+                // x left to right, add 4 bytes per pixel (RGBA), then next line
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte pixel = (byte)(info.Pixels[x / magnification, y / magnification] ? 255 : 0);
+                        pixelBytes[pixelIndex++] = pixel;// pixel; // Red
+                        pixelBytes[pixelIndex++] = pixel; // Green
+                        pixelBytes[pixelIndex++] = pixel;// pixel; // Blue
+                        pixelBytes[pixelIndex++] = 255;   // Alpha (always 0xFF)
+                    }
+                }
+
+                Dispatcher.InvokeAsync(() =>
+                {
+                    var bitmap = BitmapFactory.New(width, height).FromByteArray(pixelBytes);
+                    Screen.Stretch = Stretch.None;
+                    Screen.Source = bitmap;
+                });
             });
         }
         

@@ -5,10 +5,7 @@ public class ADDR : TwoRegistersInstruction
 {
     public override void Execute(VM vm)
     {
-        int x = vm.V[X];
-        int y = vm.V[Y];
-        vm.SetFlag(x + y > 0xFF);
-
+        vm.SetFlag(vm.V[X] + vm.V[Y] > 0xFF);
         vm.V[X] += vm.V[Y];
     }
 

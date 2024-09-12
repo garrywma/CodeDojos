@@ -52,10 +52,17 @@ namespace CHIP_8_Virtual_Machine
             {
                 if (!_paused)
                 {
-                    _stopwatch.Start();
-                    _callback();
-                    while (_stopwatch.ElapsedMilliseconds < _cycleTime) ;
-                    _stopwatch.Reset();
+                    if (_cycleTime > 0)
+                    {
+                        _stopwatch.Start();
+                        _callback();
+                        while (_stopwatch.ElapsedMilliseconds < _cycleTime) ;
+                        _stopwatch.Reset();
+                    }
+                    else
+                    {
+                        _callback();
+                    }
                 }
             }
         }

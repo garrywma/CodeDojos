@@ -118,23 +118,30 @@ namespace CHIP_8_Virtual_Machine
 
         private void InstructionCycle()
         {
-            ushort opcode = _ram.GetWord(PC);
-            Instruction instruction = InstructionDecoder.DecodeInstruction(opcode);
-            ushort pc = PC;
-            PC += 2;
-
-            instruction.Execute(this);
-            if (OnAfterExecution is not null)
+            try
             {
-                ExecutionResult result = new ExecutionResult(instruction, opcode, pc, I, F, V, _stack, _keypad.State);
-                OnAfterExecution.Invoke(this, result);
+                ushort opcode = _ram.GetWord(PC);
+                Instruction instruction = InstructionDecoder.DecodeInstruction(opcode);
+                ushort pc = PC;
+                PC += 2;
+
+                instruction.Execute(this);
+                if (OnAfterExecution is not null)
+                {
+                    ExecutionResult result = new ExecutionResult(instruction, opcode, pc, I, F, V, _stack, _keypad.State);
+                    OnAfterExecution.Invoke(this, result);
+                }
+
+                if (PC >= 0xFFF)
+                {
+                    Console.WriteLine("End of memory reached");
+                    _clock.Stop();
+                    return;
+                }
             }
-
-            if (PC >= 0xFFF)
+            catch (Exception ex)
             {
-                Console.WriteLine("End of memory reached");
-                _clock.Stop();
-                return;
+                throw ex;
             }
         }
 
